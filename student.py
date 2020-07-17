@@ -7,6 +7,9 @@ class Student:
         self.cohort_name = cohort_name
         self.exercises_collection = []
 
-    def __str__(self, first):
-        return 
+    def add_exercise(self, exercise):
+        self.exercises_collection.append(exercise)
+
+    def __str__(self):
+        return f'The students name is {self.first_name}'
         
