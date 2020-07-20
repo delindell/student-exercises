@@ -58,6 +58,6 @@ def student_report():
         assigned_exercises = []
         for exercise in student.exercises_collection:
             assigned_exercises.append(exercise.name)
-        print(f'{student.first_name} is working on {" and ".join(assigned_exercises)}')
+        print(f'{student.first_name} is working on {" and ".join(assigned_exercises)} ')
 
 student_report()
