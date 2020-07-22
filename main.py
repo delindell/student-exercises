@@ -61,3 +61,6 @@ def student_report():
         print(f'{student.first_name} is working on {" and ".join(assigned_exercises)} ')
 
 student_report()
+
+name = 'davis lindell'
+print(name.title())
