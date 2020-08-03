@@ -60,6 +60,15 @@ class StudentCohorts():
     def __repr__(self):
         return f'{self.first} {self.last} is in {self.cohort}'
 
+class InstructorCohorts():
+    def __init__(self, first, last, cohort):
+        self.first = first
+        self.last = last
+        self.cohort = cohort
+
+    def __repr__(self):
+        return f'{self.first} {self.last} teaches {self.cohort}'
+
 class StudentExerciseReports():
 
     """Methods for reports on the Student Exercises database"""
@@ -183,7 +192,7 @@ class StudentExerciseReports():
             """Retrieve all students in cohorts"""
             with sqlite3.connect(self.db_path) as conn:
                 
-                conn.row_factory = lambda cursor, row: StudentCohorts(row[1], row[2], row[4])
+                conn.row_factory = lambda cursor, row: StudentCohorts(row[1], row[2], row[5])
                 
                 db_cursor = conn.cursor()
                 
@@ -205,11 +214,40 @@ class StudentExerciseReports():
                 for student in all_students:
                     print(student)
 
+    def all_instructors_in_cohorts(self):
+            
+            """Retrieve all instructors in cohorts"""
+            with sqlite3.connect(self.db_path) as conn:
+                
+                conn.row_factory = lambda cursor, row: InstructorCohorts(row[1], row[2], row[5])
+                
+                db_cursor = conn.cursor()
+                
+                db_cursor.execute("""
+                SELECT i.id,
+                i.first_name,
+                i.last_name,
+                i.cohort_id,
+                c.id,
+                c.name
+                FROM instructors i
+                JOIN cohorts c
+                on c.id = i.cohort_id
+                order by c.name;
+                """)
+
+                all_instructors = db_cursor.fetchall()
+                
+                for instructor in all_instructors:
+                    print(instructor)
+
 reports = StudentExerciseReports()
 reports.all_students()
 reports.all_cohorts()
 reports.all_js_exercises()
 reports.all_python_exercises()
 reports.all_csharp_exercises()
+reports.all_students_in_cohorts() 
+reports.all_instructors_in_cohorts()
 
 
