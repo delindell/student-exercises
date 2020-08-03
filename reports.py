@@ -43,6 +43,23 @@ class Python():
     def __repr__(self):
         return f'{self.language} exercise {self.name}' 
 
+class CSharp():
+    def __init__(self, name, language):
+        self.name = name
+        self.language = language
+
+    def __repr__(self):
+        return f'{self.language} exercise {self.name}'
+
+class StudentCohorts():
+    def __init__(self, first, last, cohort):
+        self.first = first
+        self.last = last
+        self.cohort = cohort
+
+    def __repr__(self):
+        return f'{self.first} {self.last} is in {self.cohort}'
+
 class StudentExerciseReports():
 
     """Methods for reports on the Student Exercises database"""
@@ -75,9 +92,29 @@ class StudentExerciseReports():
             for student in all_students:
                 print(student)
 
+    def all_cohorts(self):
+            
+            """Retrieve all cohorts with the cohort name"""
+            with sqlite3.connect(self.db_path) as conn:
+                
+                conn.row_factory = lambda cursor, row: Cohort(row  [1])
+                
+                db_cursor = conn.cursor()
+                
+                db_cursor.execute("""
+                select c.id,
+                    c.name
+                from cohorts c
+                order by c.name
+                """)
+                all_cohorts = db_cursor.fetchall()
+                
+                for cohort in all_cohorts:
+                    print(cohort)   
+
     def all_js_exercises(self):
             
-            """Retrieve all exercises"""
+            """Retrieve all JS exercises"""
             with sqlite3.connect(self.db_path) as conn:
                 
                 conn.row_factory = lambda cursor, row: JavaScript(row[1], row[2])
@@ -99,7 +136,7 @@ class StudentExerciseReports():
 
     def all_python_exercises(self):
             
-            """Retrieve all exercises"""
+            """Retrieve all Python exercises"""
             with sqlite3.connect(self.db_path) as conn:
                 
                 conn.row_factory = lambda cursor, row: Python(row[1], row[2])
@@ -119,28 +156,60 @@ class StudentExerciseReports():
                 for exercise in all_exercises:
                     print(exercise)
 
-    def all_cohorts(self):
+    def all_csharp_exercises(self):
             
-            """Retrieve all cohorts with the cohort name"""
+            """Retrieve all C# exercises"""
             with sqlite3.connect(self.db_path) as conn:
                 
-                conn.row_factory = lambda cursor, row: Cohort(row  [1])
+                conn.row_factory = lambda cursor, row: CSharp(row[1], row[2])
                 
                 db_cursor = conn.cursor()
                 
                 db_cursor.execute("""
-                select c.id,
-                    c.name
-                from cohorts c
-                order by c.name
+                select e.id,
+                    e.name,
+                    e.language
+                from exercises e
+                where e.language = 'C#'
+                order by e.name
                 """)
-                all_cohorts = db_cursor.fetchall()
+                all_exercises = db_cursor.fetchall()
                 
-                for cohort in all_cohorts:
-                    print(cohort)
+                for exercise in all_exercises:
+                    print(exercise)
+
+    def all_students_in_cohorts(self):
+            
+            """Retrieve all students in cohorts"""
+            with sqlite3.connect(self.db_path) as conn:
+                
+                conn.row_factory = lambda cursor, row: StudentCohorts(row[1], row[2], row[4])
+                
+                db_cursor = conn.cursor()
+                
+                db_cursor.execute("""
+                SELECT s.id,
+                s.first_name,
+                s.last_name,
+                s.cohort_id,
+                c.id,
+                c.name
+                FROM students s
+                join cohorts c 
+                on c.id = s.cohort_id
+                order by c.name; 
+                """)
+
+                all_students = db_cursor.fetchall()
+                
+                for student in all_students:
+                    print(student)
 
 reports = StudentExerciseReports()
 reports.all_students()
 reports.all_cohorts()
 reports.all_js_exercises()
+reports.all_python_exercises()
+reports.all_csharp_exercises()
+
 
