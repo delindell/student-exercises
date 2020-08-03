@@ -307,6 +307,7 @@ class StudentExerciseReports():
         """"Getting exercises assigned by instructors"""
 
         assigned_exercises = dict()
+        student_assigned_exercises_with_instuctors = dict()
 
         with sqlite3.connect(self.db_path) as conn:
             db_cursor = conn.cursor()
@@ -316,6 +317,8 @@ class StudentExerciseReports():
             e.id exercise_id,
             e.name,
             s.id,
+            s.first_name student_first,
+            s.last_name student_last,
             s.cohort_id,
             c.id,
             i.id,
@@ -333,9 +336,9 @@ class StudentExerciseReports():
 
         for row in data_set:
             exercise_id = row[0]
-            exercise_name = row[1]
+            exercise_name = row[1] 
             instructor_id = row[2]
-            instructor_name = f'{row[6]} {row[7]}'
+            instructor_name = f'{row[8]} {row[9]}'
 
             if instructor_name not in assigned_exercises:
                 assigned_exercises[instructor_name] = [exercise_name]
@@ -347,6 +350,26 @@ class StudentExerciseReports():
             for exercise in exercises:
                 print(f'\t* {exercise}')
 
+        for row in data_set:
+            exercise_id = row[0]
+            exercise_name = row[1]
+            student_id = row[2]
+            student_name = f'{row[3]} {row[4]}'
+            instructor_name = f'{row[8]} {row[9]}'
+
+            if exercise_name not in student_assigned_exercises_with_instuctors:
+                student_assigned_exercises_with_instuctors[exercise_name] = [instructor_name]
+                student_assigned_exercises_with_instuctors[exercise_name] = [student_name]
+            else:
+                student_assigned_exercises_with_instuctors[exercise_name].append(instructor_name)
+                student_assigned_exercises_with_instuctors[exercise_name].append(student_name)
+
+            print(student_assigned_exercises_with_instuctors)
+        # for exercise_name, students, instructors in student_assigned_exercises_with_instuctors.items():
+        #     print(f'{exercise_name}:')
+        #     for student in students:
+        #         for instructor in instructors:
+        #             print(f'{instructor} has assigned this to {student}')
 
 reports = StudentExerciseReports()
 reports.all_students()
